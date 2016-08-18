@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Map Layers</title>
-    <meta name="viewport" content="initial-scale=1.0">
+    <title>Geocoding service</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <style>
       html, body {
@@ -13,24 +13,77 @@
       #map {
         height: 100%;
       }
+      #floating-panel {
+       position: absolute;
+        top: 10px;
+        right: 5%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #fff;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+        box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
+      }
+      #floating-panel #submit {
+        border: 1px solid #999;
+        background: #fff;
+        border-radius: 3px;
+        padding: 3px 12px;
+        color: #999;
+        font-family: 'Roboto','sans-serif';
+      }
+      #floating-panel #address {
+        border: none;
+        background: #fff;
+        border-bottom: 0.5px solid #ccc;
+        border-radius: 0px;
+        color: #666;
+        font-family: 'Roboto','sans-serif';
+      }
     </style>
   </head>
   <body>
+  
+    <div id="floating-panel">
+      <input id="address" type="textbox" value="">
+      <button id="submit" type="button" value="search">search</button>
+    </div>
+    
     <div id="map"></div>
+    
     <script>
-      var map;
       function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 32.098285, lng: -85.704915},
-          zoom: 8
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 8,
+          center: {lat: 32.098285	, lng: -85.704915}
+        });
+        var geocoder = new google.maps.Geocoder();
+
+        document.getElementById('submit').addEventListener('click', function() {
+          geocodeAddress(geocoder, map);
+        });
+      }
+
+      function geocodeAddress(geocoder, resultsMap) {
+        var address = document.getElementById('address').value;
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            resultsMap.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+              map: resultsMap,
+              position: results[0].geometry.location
+            });
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
         });
       }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgIU3onfzKKJIEDd3Q-Lxef1KjQM4f0ALo&callback=initMap"
-    async defer></script>
-    
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDYtJk2grzNrRKqyXhBOdrq8x0Ms7JTNNo&callback=initMap"
-    async defer></script>
-    
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDgIU3onzKKJIEDd3Q-Lxef1KjQM4f0ALo&callback=initMap">
+    </script>
   </body>
 </html>
